@@ -20,6 +20,8 @@
         <input type="text" id="text-input" placeholder="地點">
         <button type="button" id="text-input-button" @click="search" v-bind:disabled="isSearching">Enter</button>
         <h2>搜尋結果</h2>
+        <button class="btn btn-primary btn-sm" @click.prevent="playSound"
+            v-bind:disabled="soundLink == ''">播放客語</button>
         <div v-html="result"></div>
 
     </div>
@@ -30,6 +32,7 @@
             data: {
                 result: '',
                 isSearching: false,
+                soundLink: '',
             },
 
             methods: {
@@ -38,11 +41,14 @@
                         return;
                     this.isSearching = true;
                     this.result = "搜尋中...";
+                    this.soundLink = '';
 
                     let text = document.getElementById('text-input').value;
                     axios.get('/search?place=' + text)
                         .then((response) => {
-                            this.result = response.data;
+                            this.result = response.data.text;
+                            this.soundLink = response.data.sound_link;
+                            console.log(response);
                         })
                         .catch((error) => {
                             this.result = "錯誤";
@@ -50,6 +56,12 @@
                         .finally(() => {
                             this.isSearching = false;
                         });
+                },
+                playSound() {
+                    if (this.soundLink) {
+                        var audio = new Audio(this.soundLink);
+                        audio.play();
+                    }
                 },
             }
         })
