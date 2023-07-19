@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>客語景點搜尋</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+
+    <div class="container" id="app">
+        <h1>客語景點搜尋</h1>
+        <hr>
+        <input type="text" id="text-input" placeholder="地點">
+        <button type="button" id="text-input-button" @click="search" v-bind:disabled="isSearching">Enter</button>
+        <h2>搜尋結果</h2>
+        <div v-html="result"></div>
+
+    </div>
+
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#app',
+            data: {
+                result: '',
+                isSearching: false,
+            },
+
+            methods: {
+                search() {
+                    if (this.isSearching)
+                        return;
+                    this.isSearching = true;
+                    this.result = "搜尋中...";
+
+                    let text = document.getElementById('text-input').value;
+                    axios.get('/search?place=' + text)
+                        .then((response) => {
+                            this.result = response.data;
+                        })
+                        .catch((error) => {
+                            this.result = "錯誤";
+                        })
+                        .finally(() => {
+                            this.isSearching = false;
+                        });
+                },
+            }
+        })
+    </script>
+
+</body>
+
+</html>

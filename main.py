@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 import openai
 from dotenv import load_dotenv
 import os
@@ -22,10 +23,12 @@ def get_description(place: str):
 def create_app():
     app = FastAPI()
 
-    @app.get("/")
+    @app.get("/", response_class=HTMLResponse)
     def index():
         # TODO: maybe return some information about this service?
-        return "hi"
+        with open('index.html') as fh:
+            data = fh.read()
+        return HTMLResponse(content=data, status_code=200)
 
     @app.get("/search")
     def search(place: str = '六堆'):
