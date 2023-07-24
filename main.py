@@ -5,22 +5,25 @@ from dotenv import load_dotenv
 import os
 import json
 import requests
+from bardapi import Bard
 
 load_dotenv()
 openai.api_key = os.getenv('CHATGPT_TOKEN')
 baseurl = 'http://203.145.221.230:10101'
 mandarin_to_hakka_url = baseurl + '/run/predict'
+bard = Bard(token=os.getenv('BARD_TOKEN'))
 
 
 def get_description(place: str):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=f"請給予「{place}」這個地區的簡介，在五十字以內",
-        max_tokens=1024,
-        temperature=0.5,
-    )
+    # response = openai.Completion.create(
+    #     model="text-davinci-003",
+    #     prompt=f"請給予「{place}」這個地區的簡介，在五十字以內",
+    #     max_tokens=1024,
+    #     temperature=0.5,
+    # )
 
-    text = response["choices"][0]["text"]
+    # text = response["choices"][0]["text"]
+    text = bard.get_answer(f'#zh-tw {place}')['content']
     audio_json = json.dumps({"fn_index": 0, "data": [text]})
     headers = {'Content-Type': 'application/json'}
     response = requests.post(mandarin_to_hakka_url,
