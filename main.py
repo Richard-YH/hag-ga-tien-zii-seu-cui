@@ -3,9 +3,13 @@ from fastapi.responses import HTMLResponse
 import openai
 from dotenv import load_dotenv
 import os
-import json
 import requests
 from bardapi import Bard
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+import time
+import base64
+from urllib.parse import urlencode
 
 load_dotenv()
 openai.api_key = os.getenv('CHATGPT_TOKEN')
@@ -14,31 +18,41 @@ mandarin_to_hakka_url = baseurl + '/run/predict'
 bard = Bard(token=os.getenv('BARD_TOKEN'))
 
 
-def get_description(place: str):
-    # response = openai.Completion.create(
-    #     model="text-davinci-003",
-    #     prompt=f"請給予「{place}」這個地區的簡介，在五十字以內",
-    #     max_tokens=1024,
-    #     temperature=0.5,
-    # )
+def get_bone():
+    publicKey = '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCOQ5kNFYF/2+xBrCuwEuAHwhYr\nnXbU4/VCb4y97cm79PfQIRfbjavzDv99AKQ+Paujs9dbacgydeecUk5x4YuX5G+L\n+6IThMKiu2TfIpJhj1zaCqd4NLQjFewLdTWBxVhzXo90I/+TCw9pDqvdC6fTvsCG\niK/gTaLpZnOa0Rt1vQIDAQAB\n-----END PUBLIC KEY-----'
+    key = RSA.import_key(publicKey)
+    cipher = PKCS1_v1_5.new(key)
+    message = f'{int(time.time()*1000)}ilovehakka'.encode()
+    ciphertext = cipher.encrypt(message)
+    bytes_encode = base64.b64encode(ciphertext).decode()
+    return bytes_encode
 
-    # text = response["choices"][0]["text"]
-    text = bard.get_answer(f'#zh-tw {place}')['content']
-    audio_json = json.dumps({"fn_index": 0, "data": [text]})
-    headers = {'Content-Type': 'application/json'}
-    response = requests.post(mandarin_to_hakka_url,
-                             data=audio_json,
-                             headers=headers)
-    if response.status_code == 200:
-        json_response = json.loads(response.text)
-        audiopath = json_response['data'][0]['name']
-        download_link = f'{baseurl}/file={audiopath}'
-    else:
-        download_link = 'error'
+
+def get_description(place: str):
+    # get Mandarin text
+
+    text = bard.get_answer(f'#zh-tw 請給予「{place}」這個地區的簡介，在五十字以內')['content']
+
+    # get Hakka sound, han-ji, phing-im
+
+    data = {
+        'bone': get_bone(),
+        'page_name': 'hakkadic',
+        'input_lang': 'zh-tw',
+        'input_accent': '四縣腔T',
+        'input_txt': text
+    }
+    response = requests.post('https://www.gohakka.org/py/translate.py',
+                             data=urlencode(data))
+
+    json = response.json()
+    hakka = list(zip(json['hakka'], json['pinyin'].split()))
 
     return {
-        'text': text,
-        'sound_link': download_link,
+        'mandarin': text,
+        'hakka': hakka,
+        'sound_link':
+        f'https://hts.ithuan.tw/語音合成?查詢腔口=四縣腔&查詢語句={json["yee"]}',
     }
 
 
@@ -47,7 +61,6 @@ def create_app():
 
     @app.get("/", response_class=HTMLResponse)
     def index():
-        # TODO: maybe return some information about this service?
         with open('index.html') as fh:
             data = fh.read()
         return HTMLResponse(content=data, status_code=200)

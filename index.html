@@ -23,6 +23,11 @@
         <button class="btn btn-primary btn-sm" @click.prevent="playSound"
             v-bind:disabled="soundLink == ''">播放客語</button>
         <div v-html="result"></div>
+        <ruby>
+            <template v-for="(item, index) in hakka">
+                {{ item[0] }}<rt>{{ item[1] }}</rt>
+            </template>
+        </ruby>
 
     </div>
 
@@ -31,6 +36,7 @@
             el: '#app',
             data: {
                 result: '',
+                hakka: [],
                 isSearching: false,
                 soundLink: '',
             },
@@ -41,12 +47,14 @@
                         return;
                     this.isSearching = true;
                     this.result = "搜尋中...";
+                    this.hakka = [];
                     this.soundLink = '';
 
                     let text = document.getElementById('text-input').value;
                     axios.get('/search?place=' + text)
                         .then((response) => {
-                            this.result = response.data.text;
+                            this.result = response.data.mandarin;
+                            this.hakka = response.data.hakka;
                             this.soundLink = response.data.sound_link;
                             console.log(response);
                         })

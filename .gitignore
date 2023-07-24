@@ -6,5 +6,6 @@ htmlcov/
 logs.json
 tmp/
 .idea/
+test.py
 
 database.db
