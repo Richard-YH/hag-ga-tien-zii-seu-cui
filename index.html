@@ -17,17 +17,43 @@
     <div class="container" id="app">
         <h1>客語景點搜尋</h1>
         <hr>
-        <input type="text" id="text-input" placeholder="地點">
-        <button type="button" id="text-input-button" @click="search" v-bind:disabled="isSearching">Enter</button>
-        <h2>搜尋結果</h2>
-        <button class="btn btn-primary btn-sm" @click.prevent="playSound"
-            v-bind:disabled="soundLink == ''">播放客語</button>
-        <div v-html="result"></div>
-        <ruby>
-            <template v-for="(item, index) in hakka">
-                {{ item[0] }}<rt>{{ item[1] }}</rt>
-            </template>
-        </ruby>
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <input type="text" id="text-input" placeholder="地點">
+                    <button type="button" id="text-input-button" @click="search"
+                        v-bind:disabled="isSearching">Enter</button>
+                </div>
+                <div class="row">
+                    <h3>景點推薦</h3>
+                </div>
+                <div class="row">
+                    <ul>
+                        <li v-for="(item, index) in places">
+                            <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col">
+                <template v-for="(item, index) in images">
+                    <span v-html="item"></span>
+                </template>
+            </div>
+            <div class="col">
+                <h3>搜尋結果</h3>
+                <button class="btn btn-primary btn-sm" @click.prevent="playSound"
+                    v-bind:disabled="soundLink == ''">播放客語</button>
+                <div class="row" v-html="result"></div>
+                <div class="row">
+                    <ruby>
+                        <template v-for="(item, index) in hakka">
+                            {{ item[0] }}<rt>{{ item[1] }}</rt>
+                        </template>
+                    </ruby>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -39,6 +65,8 @@
                 hakka: [],
                 isSearching: false,
                 soundLink: '',
+                places: ['彰化客家桐花季', '新北市客家園區', '桃園三坑老街', '苗栗客家圓樓', '美濃民俗館'],
+                images: []
             },
 
             methods: {
@@ -49,6 +77,7 @@
                     this.result = "搜尋中...";
                     this.hakka = [];
                     this.soundLink = '';
+                    this.images = [];
 
                     let text = document.getElementById('text-input').value;
                     axios.get('/search?place=' + text)
@@ -56,7 +85,7 @@
                             this.result = response.data.mandarin;
                             this.hakka = response.data.hakka;
                             this.soundLink = response.data.sound_link;
-                            console.log(response);
+                            this.images = response.data.images
                         })
                         .catch((error) => {
                             this.result = "錯誤";
@@ -71,6 +100,12 @@
                         audio.play();
                     }
                 },
+                clickSearch(place) {
+                    if (this.isSearching)
+                        return;
+                    document.getElementById('text-input').value = place;
+                    this.search()
+                }
             }
         })
     </script>
