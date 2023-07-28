@@ -24,7 +24,7 @@
                     <button type="button" id="text-input-button" @click="search"
                         v-bind:disabled="isSearching">Enter</button>
                 </div>
-                <div class="row">
+                <div class="row pt-3">
                     <h3>景點推薦</h3>
                 </div>
                 <div class="row">
@@ -39,7 +39,7 @@
                 <div class="row">
                     <img :src="images[imageIndex]" class="img-fluid">
                 </div>
-                <div class="row">
+                <div class="row pt-3">
                     <div class="col" v-for="(item, index) in images">
                         <img :src="item" class="img-fluid" @click="setIndex(index)">
                     </div>
@@ -50,8 +50,8 @@
                 <h3>搜尋結果</h3>
                 <button class="btn btn-primary btn-sm" @click.prevent="playSound"
                     v-bind:disabled="soundLink == ''">播放客語</button>
-                <div class="row"> {{result}} </div>
-                <div class="row">
+                <div class="row pt-3"> {{result}} </div>
+                <div class="row pt-3">
                     <ruby>
                         <template v-for="(item, index) in hakka">
                             {{ item[0] }}<rt>{{ item[1] }}</rt>
@@ -85,6 +85,7 @@
                     this.hakka = [];
                     this.soundLink = '';
                     this.images = [];
+                    this.imageIndex = 0;
 
                     let text = document.getElementById('text-input').value;
                     axios.get('/search?place=' + text)
