@@ -61,7 +61,7 @@ def get_img_html(place):
     imgs = []
 
     for img in soup.find_all("img", class_=re.compile("^rg_i"), limit=4):
-        imgs.append(str(img))
+        imgs.append(img['src'])
 
     return imgs
 

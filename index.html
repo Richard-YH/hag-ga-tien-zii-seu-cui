@@ -36,9 +36,15 @@
                 </div>
             </div>
             <div class="col">
-                <template v-for="(item, index) in images">
-                    <span v-html="item"></span>
-                </template>
+                <div class="row">
+                    <img :src="images[imageIndex]" class="img-fluid">
+                </div>
+                <div class="row">
+                    <div class="col" v-for="(item, index) in images">
+                        <img :src="item" class="img-fluid" @click="setIndex(index)">
+                    </div>
+                </div>
+
             </div>
             <div class="col">
                 <h3>搜尋結果</h3>
@@ -66,7 +72,8 @@
                 isSearching: false,
                 soundLink: '',
                 places: ['彰化客家桐花季', '新北市客家園區', '桃園三坑老街', '苗栗客家圓樓', '美濃民俗館'],
-                images: []
+                images: [],
+                imageIndex: 0,
             },
 
             methods: {
@@ -105,6 +112,9 @@
                         return;
                     document.getElementById('text-input').value = place;
                     this.search()
+                },
+                setIndex(i) {
+                    this.imageIndex = i
                 }
             }
         })
