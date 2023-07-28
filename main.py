@@ -10,10 +10,7 @@ from Crypto.Cipher import PKCS1_v1_5
 import time
 import base64
 from urllib.parse import urlencode
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
-import re
 
 load_dotenv()
 openai.api_key = os.getenv('CHATGPT_TOKEN')
@@ -32,35 +29,16 @@ def get_bone():
     return bytes_encode
 
 
-def search(url):
-    # Create a browser and resize depending on user preference
-
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-
-    browser = webdriver.Chrome(options=chrome_options)
-    browser.set_window_size(1024, 768)
-
-    # Open the link
-    browser.get(url)
-    time.sleep(1)
-
-    source = browser.page_source
-
-    browser.close()
-
-    return source
-
-
 def get_img_html(place):
-    source = search(
-        f'https://www.google.com/search?q={place}&source=lnms&tbm=isch')
+    source = requests.get(
+        f'https://www.google.com/search?q={place}&source=lnms&tbm=isch').text
 
     # Parse the page source and download pics
     soup = BeautifulSoup(str(source), "lxml")
     imgs = []
 
-    for img in soup.find_all("img", class_=re.compile("^rg_i"), limit=4):
+    for img in soup.body.find_all(
+            "div", recursive=False)[2].find('tr').find_all('img', limit=4):
         imgs.append(img['src'])
 
     return imgs
