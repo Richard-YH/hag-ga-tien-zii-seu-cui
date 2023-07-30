@@ -10,6 +10,7 @@ from Crypto.Cipher import PKCS1_v1_5
 import time
 import base64
 from urllib.parse import urlencode
+from bs4 import BeautifulSoup
 
 load_dotenv()
 openai.api_key = os.getenv('CHATGPT_TOKEN')
@@ -26,6 +27,21 @@ def get_bone():
     ciphertext = cipher.encrypt(message)
     bytes_encode = base64.b64encode(ciphertext).decode()
     return bytes_encode
+
+
+def get_img_html(place):
+    source = requests.get(
+        f'https://www.google.com/search?q={place}&source=lnms&tbm=isch').text
+
+    # Parse the page source and download pics
+    soup = BeautifulSoup(str(source), "lxml")
+    imgs = []
+
+    for img in soup.body.find_all(
+            "div", recursive=False)[2].find('tr').find_all('img', limit=4):
+        imgs.append(img['src'])
+
+    return imgs
 
 
 def get_description(place: str):
@@ -53,6 +69,7 @@ def get_description(place: str):
         'hakka': hakka,
         'sound_link':
         f'https://hts.ithuan.tw/語音合成?查詢腔口=四縣腔&查詢語句={json["yee"]}',
+        'images': get_img_html(place)
     }
 
 
