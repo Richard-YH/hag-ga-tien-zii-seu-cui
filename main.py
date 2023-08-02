@@ -11,6 +11,7 @@ import time
 import base64
 from urllib.parse import urlencode
 from bs4 import BeautifulSoup
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 openai.api_key = os.getenv('CHATGPT_TOKEN')
@@ -47,7 +48,7 @@ def get_img_html(place):
 def get_description(place: str):
     # get Mandarin text
 
-    text = bard.get_answer(f'#zh-tw 請給予「{place}」這個地區的簡介，在五十字以內')['content']
+    text = bard.get_answer(f'#zh-tw 請給予「{place}」這個地區或物品的簡介，在五十字以內')['content']
 
     # get Hakka sound, han-ji, phing-im
 
@@ -89,5 +90,7 @@ def create_app():
     @app.on_event("startup")
     def on_startup():
         pass
+
+    app.mount("/images", StaticFiles(directory="images"), name="images")
 
     return app

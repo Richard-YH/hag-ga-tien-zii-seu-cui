@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>客語景點搜尋</title>
+    <title>客語文化搜尋</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
@@ -13,53 +13,109 @@
 <body>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <style>
+        .img-preview {
+            max-height: 100px;
+            object-fit: contain;
+        }
+
+        .img-show {
+            max-height: 300px;
+            object-fit: contain;
+        }
+
+        body {
+            background-color: rgb(203, 233, 243);
+        }
+    </style>
 
     <div class="container" id="app">
-        <h1>客語景點搜尋</h1>
+        <h1 class="pt-3">客語文化搜尋</h1>
         <hr>
         <div class="row">
             <div class="col">
                 <div class="row">
-                    <input type="text" id="text-input" placeholder="地點">
-                    <button type="button" id="text-input-button" @click="search"
-                        v-bind:disabled="isSearching">Enter</button>
+                    <input type="text" id="text-input" class="form-control" placeholder="地點">
+                    <button type="button" id="text-input-button" @click="search" v-bind:disabled="isSearching"
+                        class="btn btn-primary mt-2">搜尋</button>
                 </div>
                 <div class="row pt-3">
-                    <h3>景點推薦</h3>
-                </div>
-                <div class="row">
-                    <ul>
-                        <li v-for="(item, index) in places">
-                            <a href="#" @click="clickSearch(item)">{{ item }}</a>
-                        </li>
-                    </ul>
+                    <h3>搜尋推薦</h3>
+                    <div class="col">
+                        <h4>美食</h4>
+                        <div class="row">
+                            <ul>
+                                <li v-for="(item, index) in food">
+                                    <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4>歷史</h4>
+                        <div class="row">
+                            <ul>
+                                <li v-for="(item, index) in history">
+                                    <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4>民俗</h4>
+                        <div class="row">
+                            <ul>
+                                <li v-for="(item, index) in culture">
+                                    <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col">
+                <h3>圖片</h3>
                 <div class="row">
-                    <img :src="images[imageIndex]" class="img-fluid">
+                    <img :src="images[imageIndex]" class="img-fluid img-show">
                 </div>
                 <div class="row pt-3">
                     <div class="col" v-for="(item, index) in images">
-                        <img :src="item" class="img-fluid" @click="setIndex(index)">
+                        <img :src="item" class="img-fluid img-preview mx-auto d-block" @click="setIndex(index)">
                     </div>
                 </div>
 
             </div>
             <div class="col">
                 <h3>搜尋結果</h3>
-                <button class="btn btn-primary btn-sm" @click.prevent="playSound"
-                    v-bind:disabled="soundLink == ''">播放客語</button>
-                <div class="row pt-3"> {{result}} </div>
-                <div class="row pt-3">
-                    <ruby>
-                        <template v-for="(item, index) in hakka">
-                            {{ item[0] }}<rt>{{ item[1] }}</rt>
-                        </template>
-                    </ruby>
+
+                <div class="card mb-4">
+                    <div class="card-header">華語</div>
+                    <div class="card-body"> {{result}} </div>
                 </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        客語 &nbsp;
+                        <button class="btn btn-primary btn-sm" @click.prevent="playSound"
+                            v-bind:disabled="soundLink == ''">播放</button>
+                    </div>
+                    <div class="card-body">
+
+                        <ruby class="card-text">
+                            <template v-for="(item, index) in hakka">
+                                {{ item[0] }}<rt>&thinsp; {{ item[1] }} &thinsp;</rt>
+                            </template>
+                        </ruby>
+
+                    </div>
+                </div>
+
             </div>
         </div>
+    </div>
+    <div class="row pt-3">
+        <img src="./images/背景.jpg" class="img-fluid">
+    </div>
 
     </div>
 
@@ -71,7 +127,9 @@
                 hakka: [],
                 isSearching: false,
                 soundLink: '',
-                places: ['彰化客家桐花季', '新北市客家園區', '桃園三坑老街', '苗栗客家圓樓', '美濃民俗館'],
+                food: ['客家小炒', '客家擂茶', '客家粢粑仔'],
+                history: ['桃園三坑老街', '苗栗客家圓樓', '六堆'],
+                culture: ['彰化客家桐花季', '新北市客家園區', '美濃民俗館'],
                 images: [],
                 imageIndex: 0,
             },
