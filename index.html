@@ -32,7 +32,87 @@
     <div class="container" id="app">
         <h1 class="pt-3">客語文化搜尋</h1>
         <hr>
-        <div class="row">
+        <div v-if="windowWidth <= 1000" class="row">
+            <div class="row">
+                <div class="row">
+                    <input type="text" id="text-input" class="form-control" placeholder="地點">
+                    <button type="button" id="text-input-button" @click="search" v-bind:disabled="isSearching"
+                        class="btn btn-primary mt-2">搜尋</button>
+                </div>
+                <div class="row pt-3">
+                    <h3>搜尋推薦</h3>
+                    <div class="col">
+                        <h4>美食</h4>
+                        <div class="row">
+                            <ul>
+                                <li v-for="(item, index) in food">
+                                    <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4>歷史</h4>
+                        <div class="row">
+                            <ul>
+                                <li v-for="(item, index) in history">
+                                    <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4>民俗</h4>
+                        <div class="row">
+                            <ul>
+                                <li v-for="(item, index) in culture">
+                                    <a href="#" @click="clickSearch(item)">{{ item }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h3>搜尋結果</h3>
+
+                <div class="card mb-4">
+                    <div class="card-header">華語</div>
+                    <div class="card-body"> {{result}} </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        客語 &nbsp;
+                        <button class="btn btn-primary btn-sm" @click.prevent="playSound"
+                            v-bind:disabled="soundLink == ''">播放</button>
+                    </div>
+                    <div class="card-body">
+
+                        <ruby class="card-text">
+                            <template v-for="(item, index) in hakka">
+                                {{ item[0] }}<rt>&thinsp; {{ item[1] }} &thinsp;</rt>
+                            </template>
+                        </ruby>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <h3>圖片</h3>
+                <div class="row">
+                    <img :src="images[imageIndex]" class="img-fluid img-show">
+                </div>
+                <div class="row pt-3">
+                    <div class="col" v-for="(item, index) in images">
+                        <img :src="item" class="img-fluid img-preview mx-auto d-block" @click="setIndex(index)">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div v-else class="row">
             <div class="col">
                 <div class="row">
                     <input type="text" id="text-input" class="form-control" placeholder="地點">
@@ -74,18 +154,6 @@
                 </div>
             </div>
             <div class="col">
-                <h3>圖片</h3>
-                <div class="row">
-                    <img :src="images[imageIndex]" class="img-fluid img-show">
-                </div>
-                <div class="row pt-3">
-                    <div class="col" v-for="(item, index) in images">
-                        <img :src="item" class="img-fluid img-preview mx-auto d-block" @click="setIndex(index)">
-                    </div>
-                </div>
-
-            </div>
-            <div class="col">
                 <h3>搜尋結果</h3>
 
                 <div class="card mb-4">
@@ -111,10 +179,22 @@
                 </div>
 
             </div>
+            <div class="col">
+                <h3>圖片</h3>
+                <div class="row">
+                    <img :src="images[imageIndex]" class="img-fluid img-show">
+                </div>
+                <div class="row pt-3">
+                    <div class="col" v-for="(item, index) in images">
+                        <img :src="item" class="img-fluid img-preview mx-auto d-block" @click="setIndex(index)">
+                    </div>
+                </div>
+
+            </div>
         </div>
-    </div>
-    <div class="row pt-3">
-        <img src="./images/背景.jpg" class="img-fluid">
+        <div class="row pt-3">
+            <img src="./images/背景.jpg" class="img-fluid">
+        </div>
     </div>
 
     </div>
@@ -132,9 +212,22 @@
                 culture: ['彰化客家桐花季', '新北市客家園區', '美濃民俗館'],
                 images: [],
                 imageIndex: 0,
+                windowWidth: window.innerWidth,
+            },
+
+            created() {
+                window.addEventListener("resize", this.onResize);
+            },
+
+            destroyed() {
+                window.removeEventListener("resize", this.onResize);
             },
 
             methods: {
+                onResize() {
+                    this.windowWidth = window.innerWidth;
+                },
+
                 search() {
                     if (this.isSearching)
                         return;
