@@ -19,6 +19,17 @@
             object-fit: contain;
         }
 
+        .img-btn {
+            max-height: 100px;
+            object-fit: contain;
+        }
+
+        .img-preview-selected {
+            border-color: #4285f4 !important;
+            ;
+            background-color: rgba(232, 240, 254, 0.5) !important;
+        }
+
         .img-show {
             max-height: 300px;
             object-fit: contain;
@@ -31,16 +42,16 @@
         }
 
         h1 {
-            font-size: 10vw;
-            font-family: DFKai-sb, 標楷體, BiauKai;
+            font-size: min(10vw, 90px);
+            font-family: DFKai-sb, 標楷體, BiauKai, DFBiauKaiShu-B5;
         }
     </style>
 
     <div class="container" id="app">
-        <h1 v-if="windowWidth <= 1000" class="pt-3 d-flex justify-content-center">客家文化搜尋</h1>
+        <h1 class="pt-3 d-flex justify-content-center">客家文化搜尋</h1>
         <hr>
         <div class="row d-flex justify-content-center">
-            <div class="row">
+            <div class="row d-flex justify-content-center">
                 <div class="row">
                     <input type="text" id="text-input" class="form-control" placeholder="地點">
                     <button type="button" id="text-input-button" @click="search" v-bind:disabled="isSearching"
@@ -80,12 +91,12 @@
                 </div>
             </div>
             <div class="row">
-                <div class="card mb-4">
+                <div class="card mb-4 px-0">
                     <div class="card-header">華語</div>
                     <div class="card-body"> {{result}} </div>
                 </div>
 
-                <div class="card mb-4">
+                <div class="card mb-4 px-0">
                     <div class="card-header">
                         客語 &nbsp;
                         <button class="btn btn-primary btn-sm" @click.prevent="playSound"
@@ -104,11 +115,20 @@
 
             </div>
             <div class="row">
-                <div class="row">
-                    <img :src="images[imageIndex]" class="img-fluid img-show">
+                <div class="d-flex flex-row justify-content-center">
+                    <button @click="imageIndex = (imageIndex - 1 + images.length) % images.length" class="btn btn-link">
+                        <img src="./images/往左.png" class="img-fluid mx-auto d-block img-btn">
+                    </button>
+                    <img :src="images[imageIndex]" class="img-fluid img-show w-100">
+                    <button @click="imageIndex = (imageIndex + 1) % images.length" class="btn btn-link">
+                        <img src="./images/往右.png" class="img-fluid mx-auto d-block img-btn">
+                    </button>
+
                 </div>
                 <div class="row pt-3">
-                    <div class="col" v-for="(item, index) in images">
+                    <div class="col"
+                        v-bind:class="imageIndex == index ? 'rounded-2 border border-1 img-preview-selected' : ''"
+                        v-for="(item, index) in images">
                         <img :src="item" class="img-fluid img-preview mx-auto d-block" @click="setIndex(index)">
                     </div>
                 </div>
