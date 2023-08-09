@@ -7,5 +7,6 @@ logs.json
 tmp/
 .idea/
 test.py
+test.js
 
 database.db

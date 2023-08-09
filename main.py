@@ -30,6 +30,20 @@ def get_bone():
     return bytes_encode
 
 
+def decode_part(text, is_han_ji=True):
+    text = '【\t\t〗' + text
+    array_a = text.strip().split('【\t')
+    array_b = []
+    for a in array_a[1:]:
+        tmp = a.split('\t〗')
+        if is_han_ji:
+            array_b.extend(list(tmp[0]) + [tmp[1]])
+        else:
+            array_b.extend(tmp[0].split(' ') + [tmp[1]])
+
+    return [a for a in array_b if a]
+
+
 def get_img_html(place):
     source = requests.get(
         f'https://www.google.com/search?q={place}&source=lnms&tbm=isch').text
@@ -63,7 +77,12 @@ def get_description(place: str):
                              data=urlencode(data))
 
     json = response.json()
-    hakka = list(zip(json['hakka'], json['pinyin'].split()))
+    han_ji = decode_part(json['hakkapart'], True)
+    phing_im = decode_part(json['participle'], False)
+    if len(han_ji) != len(phing_im):
+        print(f'Length not same:\n{han_ji}\n{" ".join(phing_im)}')
+
+    hakka = list(zip(han_ji, phing_im))
 
     return {
         'mandarin': text,
